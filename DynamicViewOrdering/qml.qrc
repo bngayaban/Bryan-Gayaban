@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>PetsModel.qml</file>
+        <file>PageModel.qml</file>
         <file>testPage1.qml</file>
     </qresource>
 </RCC>

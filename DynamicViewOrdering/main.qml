@@ -79,7 +79,7 @@ ApplicationWindow {
         DelegateModel {
             id: visualModel
 
-            model: PetsModel {}
+            model: PageModel {}
             delegate: dragDelegate
         }
 
