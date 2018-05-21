@@ -1,97 +1,81 @@
-import QtQuick 2.0
+import QtQuick 2.6
 import QtQml.Models 2.1
 import QtQuick.Controls 2.2
+import QtQuick.Layouts 1.1
 
 ApplicationWindow {
-    id: root
     visible: true
+    width: 500
+    height: 400
 
-    Rectangle {
-        anchors.fill: parent
-        id: rect
-        Component {
-            id: dragDelegate
-
-            MouseArea {
-                id: dragArea
-
-                property bool held: false
-
-                anchors { left: parent.left; right: parent.right }
-                height: content.height
-
-                drag.target: held ? content : undefined
-                drag.axis: Drag.YAxis
-                propagateComposedEvents: true
-                onPressAndHold: held = true
-                onReleased: held = false
+    Item {
+            id: mainContent
+            anchors.fill: parent
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 0
 
                 Rectangle {
-                    id: content
-                    anchors {
-                        horizontalCenter: parent.horizontalCenter
-                        verticalCenter: parent.verticalCenter
-                    }
-                    width: dragArea.width; height: rect.height/3
+                    color: "lightblue"
+                    height: 50
+                    Layout.fillWidth: true
 
-
-
-                    border.width: 5
-                    border.color: "lightsteelblue"
-
-                    color: dragArea.held ? "lightsteelblue" : "red"
-                    Behavior on color { ColorAnimation { duration: 100 } }
-
-                    radius: 2
-                    Drag.active: dragArea.held
-                    Drag.source: dragArea
-                    Drag.hotSpot.x: width / 2
-                    Drag.hotSpot.y: height / 2
-                    states: State {
-                        when: dragArea.held
-
-                        ParentChange { target: content; parent: rect }
-                        AnchorChanges {
-                            target: content
-                            anchors { horizontalCenter: undefined; verticalCenter: undefined }
-                        }
-                    }
-
-                    Loader{
-                        id: tileLoader
+                    Text {
                         anchors.centerIn: parent
-                        width: parent.width/2
-                        height: parent.height/2
-                        source: page
+                        text: "A fake toolbar"
                     }
                 }
-                DropArea {
-                    anchors { fill: parent; margins: 10 }
 
-                    onEntered: {
-                        visualModel.items.move(
-                                    drag.source.DelegateModel.itemsIndex,
-                                    dragArea.DelegateModel.itemsIndex)
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    ListView {
+                        id: listView
+                        model: PageModel
+                        delegate: DraggableItem {
+                            Rectangle {
+                                height: parent.height/3
+                                width: listView.width
+                                color: "white"
+
+                                Loader{
+                                    id: tileLoader
+                                    anchors.centerIn: parent
+                                    width: parent.width/2
+                                    height: parent.height/2
+                                    source: page
+                                }
+
+                                // Bottom line border
+                                Rectangle {
+                                    anchors {
+                                        left: parent.left
+                                        right: parent.right
+                                        bottom: parent.bottom
+                                    }
+                                    height: 1
+                                    color: "lightgrey"
+                                }
+                            }
+
+                            draggedItemParent: mainContent
+
+                            onMoveItemRequested: {
+                                myModel.move(from, to, 1);
+                            }
+                        }
                     }
                 }
             }
         }
-        DelegateModel {
-            id: visualModel
 
-            model: PageModel {}
-            delegate: dragDelegate
-        }
-
-        ListView {
-            id: view
-
-            anchors { fill: parent; margins: 2 }
-
-            model: visualModel
-
-            spacing: 4
-            cacheBuffer: 50
-        }
+    /*
+    Loader{
+        id: tileLoader
+        anchors.centerIn: parent
+        width: parent.width/2
+        height: parent.height/2
+        source: page
     }
+    */
 }
